@@ -1,4 +1,4 @@
-﻿// Created by BladeMight in 05.12.2016-18:55
+// Created by BladeMight in 05.12.2016-18:55
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -35,18 +35,19 @@ namespace Mahou
 			var tologmsg = msgtime + " [" + messagetype + "]: " + logmsg + "\r\n";
 			_logMessages.Add(tologmsg);
 			}
-		public static void UpdateLog() {
-			lock (locky) {
-				foreach (var msg in _logMessages.GetConsumingEnumerable()) {
-					#if VSCDEBUG
-						Console.Write(msg);
-					#elif DEBUG 
-						Debug.Write(msg);
-					#else
-						File.AppendAllText(log, msg);
-					#endif
-				}
+	public static void UpdateLog() {
+		lock (locky) {
+			string msg;
+			while (_logMessages.TryTake(out msg)) {
+				#if VSCDEBUG
+					Console.Write(msg);
+				#elif DEBUG 
+					Debug.Write(msg);
+				#else
+					File.AppendAllText(log, msg);
+				#endif
 			}
 		}
+	}
 	}
 }

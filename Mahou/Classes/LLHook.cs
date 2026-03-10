@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -87,11 +87,12 @@ namespace Mahou {
 			}
 			return br;
 		}
-		public static IntPtr Callback(int nCode, IntPtr wParam, IntPtr lParam) {
-			if (MMain.mahou == null || nCode < 0) return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
-			if (KMHook.ExcludedProgram() && !MahouUI.ChangeLayoutInExcluded) 
-				return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
-			var vk = Marshal.ReadInt32(lParam);
+	public static IntPtr Callback(int nCode, IntPtr wParam, IntPtr lParam) {
+		if (MMain.mahou == null || nCode < 0) return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
+		try {
+		if (KMHook.ExcludedProgram() && !MahouUI.ChangeLayoutInExcluded) 
+			return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
+		var vk = Marshal.ReadInt32(lParam);
 			var Key = (Keys)vk;
 			if (MahouUI.BlockAltUpNOW) {
 				if ((wParam == (IntPtr)WinAPI.WM_SYSKEYUP || wParam == (IntPtr)WinAPI.WM_KEYUP) && 
@@ -294,10 +295,14 @@ namespace Mahou {
 					WinAPI.keybd_event((byte)Keys.F18, (byte)Keys.F18, flags , 0);
 					return (IntPtr)1; // Disable event
 				}
-	//			Debug.WriteLine(Marshal.GetLastWin32Error());
-			}
+//			Debug.WriteLine(Marshal.GetLastWin32Error());
+		}
+		return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
+		} catch (Exception ex) {
+			Logging.Log("LLHook.Callback error: " + ex.Message + "\r\n" + ex.StackTrace, 1);
 			return WinAPI.CallNextHookEx(_LLHook_ID, nCode, wParam, lParam);
 		}
+	}
 		static void SetModifs(Keys Key, IntPtr msg) {
 			switch (Key) {
 				case Keys.LShiftKey:

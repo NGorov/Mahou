@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Drawing;
@@ -115,10 +115,10 @@ namespace Mahou {
 								try {
 									jkluMSG[ii] = Int32.Parse(File.ReadAllText(umsgID));
 									break;
-								} catch(Exception e) {
-									max_tries--;
-									Thread.Sleep(50);
-								}
+							} catch {
+								max_tries--;
+								Thread.Sleep(50);
+							}
 							}
 							File.Delete(umsgID);
 	//						KMHook.DoLater(() => CycleAllLayouts(Locales.ActiveWindow()), 350);

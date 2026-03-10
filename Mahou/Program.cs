@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
@@ -35,19 +35,24 @@ namespace Mahou
 		public static bool C_SWITCH = false;
 		public static IntPtr MAHOU_HANDLE;
 		public static RawInputForm rif;
-		public static System.Threading.Timer _logTimer = new System.Threading.Timer((_) => { try { Logging.UpdateLog(); } catch (Exception e) { Logging.Log("Error updating log, details:\r\n" + e.Message);}}, null, 20, 300);
-		public static List<string> lcnmid = new List<string>();
-		#endregion
+	public static System.Threading.Timer _logTimer = new System.Threading.Timer((_) => { try { Logging.UpdateLog(); } catch (Exception ex) { Logging.Log("Error updating log, details:\r\n" + ex.Message);}}, null, 20, 300);
+	public static long _lastEventHookTick = DateTime.UtcNow.Ticks;
+	public static Timer _winEventHealthTimer;
+	public static List<string> lcnmid = new List<string>();
+	#endregion
 		[STAThread] //DO NOT REMOVE THIS
         public static void Main(string[] args) {
 			Application.EnableVisualStyles(); // at first enable styles.
 			SetProcessDPIAware();
 			//Catch any error during program runtime
-			AppDomain.CurrentDomain.UnhandledException += (obj, arg) => {
-				var e = (Exception)arg.ExceptionObject;
-				Logging.Log("Unexpected error occurred, Mahou exited, error details:\r\n" + e.Message+"\r\n" + e.StackTrace, 1);
-			};
-			Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+		AppDomain.CurrentDomain.UnhandledException += (obj, arg) => {
+			var ex = (Exception)arg.ExceptionObject;
+			Logging.Log("Unexpected error occurred, Mahou exited, error details:\r\n" + ex.Message+"\r\n" + ex.StackTrace, 1);
+		};
+		Application.ThreadException += (sender, targ) => {
+			Logging.Log("UI thread exception:\r\n" + targ.Exception.Message + "\r\n" + targ.Exception.StackTrace, 1);
+		};
+		Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 			if (System.Globalization.CultureInfo.InstalledUICulture.TwoLetterISOLanguageName == "ru")
 				Lang = Languages.Russian;
 			MyConfs = new Configs();
@@ -83,9 +88,9 @@ namespace Mahou
 								try {
 									Directory.CreateDirectory(args[ind+1]);
 									ok = true;
-								} catch (Exception e) {
-									Logging.Log("Can't create directory: "+args[ind+1]);
-								}
+							} catch {
+								Logging.Log("Can't create directory: "+args[ind+1]);
+							}
 							}
 							if (ok) {
 								Logging.Log("Switching config directory to : " + args[ind+1]);
@@ -139,11 +144,15 @@ namespace Mahou
 					if (lcnmid.Count > 1)
 						mahou.cbb_MainLayout2.SelectedIndex = 1;
 				}
-				_evt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_SYSTEM_FOREGROUND, WinAPI.EVENT_SYSTEM_FOREGROUND,
-				                                     IntPtr.Zero, _evt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
-				_LDevt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_OBJECT_FOCUS, WinAPI.EVENT_OBJECT_FOCUS,
-				                                     IntPtr.Zero, _LDevt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
-				if (args.Length != 0) {
+			_evt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_SYSTEM_FOREGROUND, WinAPI.EVENT_SYSTEM_FOREGROUND,
+			                                     IntPtr.Zero, _evt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
+			_LDevt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_OBJECT_FOCUS, WinAPI.EVENT_OBJECT_FOCUS,
+			                                     IntPtr.Zero, _LDevt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
+			_winEventHealthTimer = new Timer();
+			_winEventHealthTimer.Interval = 30000;
+			_winEventHealthTimer.Tick += (_, __) => { ReRegisterWinEventHooksIfNeeded(); };
+			_winEventHealthTimer.Start();
+			if (args.Length != 0) {
 					if (args[0] == "_!_updated_!_") {
 						Logging.Log("Mahou updated.");
 						mahou.ToggleVisibility();
@@ -172,7 +181,27 @@ namespace Mahou
 				lcnmid.Add(lc.Lang + "(" + lc.uId + ")");
 			}
         }
-		public static bool MahouActive() {
+		public static void ReRegisterWinEventHooksIfNeeded() {
+		try {
+			var elapsed = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - System.Threading.Interlocked.Read(ref _lastEventHookTick));
+			if (elapsed.TotalSeconds > 60) {
+				Logging.Log("WinEvent hooks appear stale (no callback for " + (int)elapsed.TotalSeconds + "s), re-registering...", 2);
+				if (_evt_hookID != IntPtr.Zero)
+					WinAPI.UnhookWinEvent(_evt_hookID);
+				if (_LDevt_hookID != IntPtr.Zero)
+					WinAPI.UnhookWinEvent(_LDevt_hookID);
+				_evt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_SYSTEM_FOREGROUND, WinAPI.EVENT_SYSTEM_FOREGROUND,
+				                                     IntPtr.Zero, _evt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
+				_LDevt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_OBJECT_FOCUS, WinAPI.EVENT_OBJECT_FOCUS,
+				                                     IntPtr.Zero, _LDevt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
+				System.Threading.Interlocked.Exchange(ref _lastEventHookTick, DateTime.UtcNow.Ticks);
+				Logging.Log("WinEvent hooks re-registered.");
+			}
+		} catch (Exception ex) {
+			Logging.Log("WinEvent health check error: " + ex.Message, 1);
+		}
+	}
+	public static bool MahouActive() {
 			var ActHandle = WinAPI.GetForegroundWindow();
 			if (ActHandle == IntPtr.Zero) {
 				return false;

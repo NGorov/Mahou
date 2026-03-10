@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
@@ -162,7 +162,7 @@ namespace Mahou {
 //						tr = s.Substring(1, s.Length-2);
 						try {
 							det_l = auri["ld_result", "srclangs", "^0"];
-						} catch (Exception EE) {
+						} catch {
 							det_l = Regex.Match(auri.raw, ".*?\"ld_result\":.*?\"srclangs\".*?\\[(.*?)\\]").Groups[1].Value;
 						}
 					}

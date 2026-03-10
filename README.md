@@ -54,9 +54,25 @@ https://ko-fi.com/blademight
 
 ###### История изменений:
 
-<details><summary><b>v2.9.0.1 по 2.0.0.0</b></summary>
+<details><summary><b>v2.9.1.0 по 2.0.0.0</b></summary>
 
-**latest-commit (v2.9.0.1-dev <...>)**
+**v2.9.1.0**
+
+- 🐛 Исправлена критическая утечка потоков в Logging.UpdateLog(), вызывавшая тихое завершение процесса через ~30-60 минут работы на Windows 11.
+  Метод GetConsumingEnumerable() блокировал поток навечно, а System.Threading.Timer каждые 300мс создавал новый поток,
+  что приводило к исчерпанию памяти (~3.6ГБ стеков) и убийству процесса системой.
+- 💎 Добавлен обработчик Application.ThreadException для логирования ошибок UI-потока.
+- 🐛 Исправлено что DoSelf не восстанавливал хуки/горячие клавиши/RawInput при ошибке в действии (добавлен try/finally).
+- 🐛 Добавлен try/catch в DoLater для предотвращения падений от необработанных ошибок в пуле потоков.
+- 🐛 Добавлен try/catch в EventHookCallback, LDEventHook и LLHook.Callback для предотвращения тихого удаления хуков Windows 11.
+- 🐛 Исправлена ошибка двойного освобождения памяти в NativeClipboard.clip_set: GlobalFree вызывался после SetClipboardData, который забирает владение памятью.
+- 💎 Добавлена декларация совместимости с Windows Vista/7/8/8.1/10/11 в app.manifest (supportedOS).
+- 💎 Добавлена периодическая проверка здоровья WinEvent хуков с автоматической пере-регистрацией при обнаружении что они перестали работать.
+- 🐛 Исправлено что PreExit не снимал LLHook когда он был активен не через RemapCapslockAsF18.
+- 💎 Добавлена очистка WinEvent хуков при выходе из программы (UnhookWinEvent).
+- 📝 Исправлены все предупреждения компилятора (неиспользуемые переменные и поля).
+
+**v2.9.0.1-dev**
 
 - [commits](https://gitea.com/BladeMight/Mahou/commits/master)
 	
@@ -807,9 +823,25 @@ https://ko-fi.com/blademight
 
 ###### Change log:
 
-<details><summary> v2.9.0.1 to v2.0.0.0</summary>
+<details><summary> v2.9.1.0 to v2.0.0.0</summary>
 
-**latest-commit (v2.9.0.1-dev <...>)**
+**v2.9.1.0**
+
+- 🐛 Fixed critical thread pool leak in Logging.UpdateLog() causing silent process exit after ~30-60 minutes on Windows 11.
+  GetConsumingEnumerable() blocked the calling thread forever, while System.Threading.Timer spawned a new thread every 300ms,
+  exhausting memory (~3.6GB of thread stacks) until Windows silently killed the process.
+- 💎 Added Application.ThreadException handler to log UI-thread exceptions.
+- 🐛 Fixed DoSelf not restoring hooks/hotkeys/RawInput when action throws (added try/finally).
+- 🐛 Added try/catch to DoLater to prevent unhandled thread pool exceptions from crashing the process.
+- 🐛 Added try/catch to EventHookCallback, LDEventHook and LLHook.Callback to prevent Windows 11 from silently removing hooks on exception.
+- 🐛 Fixed double-free memory corruption in NativeClipboard.clip_set: GlobalFree was called after SetClipboardData which takes ownership of the memory handle.
+- 💎 Added Windows Vista/7/8/8.1/10/11 compatibility declarations to app.manifest (supportedOS).
+- 💎 Added periodic WinEvent hook health check with automatic re-registration when hooks stop responding.
+- 🐛 Fixed PreExit not unhooking LLHook when it was active for reasons other than RemapCapslockAsF18.
+- 💎 Added proper WinEvent hook cleanup on exit (UnhookWinEvent).
+- 📝 Fixed all compiler warnings (unused variables and fields).
+
+**v2.9.0.1-dev**
 
 - [commits](https://gitea.com/BladeMight/Mahou/commits/master)
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -17,7 +17,7 @@ namespace Mahou
         /// Gets clipboard text if clipboard data contains text(CF_UNICODETEXT).
         /// </summary>
         /// <returns>string</returns>
-        public static string GetText(uint format=WinAPI.CF_UNICODETEXT, bool wide=true)  { // Gets text data from clipboard
+        public static string GetText(uint format=WinAPI.CF_UNICODETEXT, bool wide=true)  { // Gets text data from clipboard
             if (!WinAPI.IsClipboardFormatAvailable(format))
                 return null;
             int Tries = 0;
@@ -97,8 +97,7 @@ namespace Mahou
 				IntPtr glock = WinAPI.GlobalLock(alloc);
 				Marshal.Copy(c.d[i], 0, glock, c.d[i].Length);
 				WinAPI.GlobalUnlock(glock);
-				WinAPI.SetClipboardData(c.f[i], alloc);
-				WinAPI.GlobalFree(alloc);
+			WinAPI.SetClipboardData(c.f[i], alloc);
 //				Marshal.FreeHGlobal(hglob);
 			}
 			WinAPI.CloseClipboard();

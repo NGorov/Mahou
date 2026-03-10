@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -26,8 +26,8 @@ namespace Mahou {
 					SidebarWidth = GetMCDSValue("SBW", info);
 					viewID = GetMCDSValue("VID", info);
 				}
-			} catch (Exception e) {  
-			}
+		} catch {  
+		}
 		}
 		public static Point GetCaretPosFromOleAcc(IntPtr hwnd) {
 			var IID_IAcce = new Guid("618736E0-3C3D-11CF-810C-00AA00389B71");

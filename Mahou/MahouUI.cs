@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -2485,10 +2485,10 @@ DEL """+restartMahouPath + @"""";
 //				Debug.WriteLine(p[0].Id + " " + force);
 				explorer_pid = p[0].Id;
 				explorer_not_found_tries = 0;
-			} catch(Exception e) {
-				fong = true;
-				explorer_not_found_tries++;
-			}
+		} catch {
+			fong = true;
+			explorer_not_found_tries++;
+		}
 			if (explorer_not_found_tries > 5) {
 				fong = false;
 				if (explorer_not_found_tries < 15) {
@@ -3525,10 +3525,13 @@ DEL """+restartMahouPath + @"""";
 				jklXHidServ.Destroy();
 			if (hideicon)
 				icon.Hide();
-			if (RemapCapslockAsF18)
+			if (LLHook._ACTIVE)
 				LLHook.UnSet();
 			MMain.mahou.UnregisterHotkeys(noglobal);
 			MMain.rif.RegisterRawInputDevices(IntPtr.Zero, WinAPI.RawInputDeviceFlags.Remove);
+			if (MMain._winEventHealthTimer != null) { MMain._winEventHealthTimer.Stop(); MMain._winEventHealthTimer.Dispose(); }
+			if (MMain._evt_hookID != IntPtr.Zero) { WinAPI.UnhookWinEvent(MMain._evt_hookID); MMain._evt_hookID = IntPtr.Zero; }
+			if (MMain._LDevt_hookID != IntPtr.Zero) { WinAPI.UnhookWinEvent(MMain._LDevt_hookID); MMain._LDevt_hookID = IntPtr.Zero; }
 			if (uche != null)
 				uche.Abort();
 			if (tmr != null) { tmr.Stop(); tmr.Dispose(); }
@@ -3562,10 +3565,10 @@ DEL """+restartMahouPath + @"""";
 				Process.Start(piKill);
 				piKill.Arguments = "/PID " + Process.GetCurrentProcess().Id + " /F";
 				Process.Start(piKill);
-			} catch (Exception e) {
-				Logging.Log("Taskkill error, try exit normally...", 1);
-				Application.Exit();
-			}
+		} catch {
+			Logging.Log("Taskkill error, try exit normally...", 1);
+			Application.Exit();
+		}
 		}
 		/// <summary>
 		/// Registers keys 1->9 & 0 on keyboard as hotkey to be used as word count selector for Convert Multiple Words Count.
@@ -4953,12 +4956,7 @@ DEL ""ExtractASD.cmd""";
 			Logging.Log("Language changed.");
 			SetTooltips();
 		}
-		class MTheme {
-			public Color BG;
-			public Color FG;
-			public Color TAB_BORDERS;
-			public Color TAB_FOCUS_BG;
-		}
+	
 		void ToggleDark(bool yes) {
 			var BGDARK = Color.FromArgb(51, 54, 58);
 			var FGDARK = Color.FromArgb(181, 181, 181);
