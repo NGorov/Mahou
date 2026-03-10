@@ -1,12 +1,14 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using NLog;
 namespace Mahou
 {
 	public partial class MahouForm : Form
 	{
+		private static readonly Logger log = LogManager.GetCurrentClassLogger();
 		#region DLL (dummy hotkey)
 		[DllImport("user32.dll")]
 		public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, int vk);
@@ -35,14 +37,16 @@ namespace Mahou
 		public MahouForm()
 		{
 			InitializeComponent();
-			res.Tick += (_, __) => {
-//				Console.WriteLine("hiding");
+		res.Tick += (_, __) => {
+			try {
 				onepass = true;
 				langDisplay.HideWnd();
 				res.Stop();
-			};
+			} catch(Exception ex) { log.Error(ex, "Error in res.Tick"); }
+		};
 			res.Interval = ICheck.Interval * 4;
-			ICheck.Tick += (_, __) => {
+		ICheck.Tick += (_, __) => {
+			try {
 				if (MMain.MyConfs.ReadBool("Functions", "DTTOnChange")) {
 					if (onepass) {
 						latestL = Locales.GetCurrentLocale();
@@ -61,8 +65,10 @@ namespace Mahou
 				langDisplay.Location = new Point(Cursor.Position.X + MMain.MyConfs.ReadInt("TTipUI", "xpos"),
 					Cursor.Position.Y + MMain.MyConfs.ReadInt("TTipUI", "ypos"));
 				langDisplay.RefreshLang();
-			};
-			ScrlCheck.Tick += (_, __) => {
+			} catch(Exception ex) { log.Error(ex, "Error in ICheck.Tick"); }
+		};
+		ScrlCheck.Tick += (_, __) => {
+			try {
 				if (MMain.MyConfs.ReadBool("Functions", "ScrollTip") && !KMHook.self) {
 					KMHook.self = true;
 					if (Locales.GetCurrentLocale() == MMain.MyConfs.ReadInt("Locales", "locale1uId")) {
@@ -78,7 +84,8 @@ namespace Mahou
 					}
 					KMHook.self = false;
 				}
-			};
+			} catch(Exception ex) { log.Error(ex, "Error in ScrlCheck.Tick"); }
+		};
 			ScrlCheck.Interval = 250;
 			if (MMain.MyConfs.ReadBool("Functions", "ScrollTip"))
 				ScrlCheck.Start();
@@ -574,9 +581,9 @@ namespace Mahou
 				"Mahou.lnk")) ? true : false;
 			RefreshLocales();
 		}
-		void RefreshLocales() //Re-adds existed locales to select boxes
-		{
-			Locales.IfLessThan2();
+	void RefreshLocales() //Re-adds existed locales to select boxes
+	{
+		if(Locales.IfLessThan2()) return;
 			MMain.locales = Locales.AllList();
 			cbLangOne.Items.Clear();
 			cbLangTwo.Items.Clear();

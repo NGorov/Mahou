@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -40,14 +40,18 @@ namespace Mahou
 			}
 			return locs.ToArray();
 		}
-		public static void IfLessThan2() //Check if you have enough layouts
-		{
-			if (AllList().Length < 2) {
+	public static bool IfLessThan2(bool exitOnFail = false)
+	{
+		if (AllList().Length < 2) {
+			if(exitOnFail) {
 				MessageBox.Show("This program switches texts by system's layouts(locales/languages), please add at least 2!\nProgram will exit.",
 				                "You have too less layouts(locales/languages)!!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
 				Application.Exit();
 			}
+			return true;
 		}
+		return false;
+	}
 		#region Structs
 		public struct Locale
 		{

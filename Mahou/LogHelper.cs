@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using NLog.Config;
 using NLog.Targets;
 
@@ -19,7 +19,7 @@ namespace Mahou {
 #if DEBUG
             rule2 = new LoggingRule("*", LogLevel.Trace, fileTarget);
 #else
-            rule2= new LoggingRule("*", LogLevel.Warn, fileTarget);
+            rule2 = new LoggingRule("*", LogLevel.Info, fileTarget);
 #endif
             config.LoggingRules.Add(rule2);
 

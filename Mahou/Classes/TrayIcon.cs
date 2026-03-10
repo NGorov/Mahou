@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 
 namespace Mahou
@@ -23,7 +23,6 @@ namespace Mahou
             trIcon.Text = "Mahou (魔法)\nA magical layout switcher.";
             trIcon.ContextMenu = cMenu;
             trIcon.MouseDoubleClick += ShowHideHandler;
-            trIcon.BalloonTipClicked += ExitHandler;
         }
         void ExitHandler(object sender, EventArgs e)
         {

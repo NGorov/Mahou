@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -53,30 +53,36 @@ namespace Mahou
             EmptyClipboard();
             CloseClipboard();
         }
-        public static string GetText() // Gets text data from clipboard
+    public static string GetText() // Gets text data from clipboard
+    {
+        if (!IsClipboardFormatAvailable((uint)uFormat.CF_UNICODETEXT))
+            return null;
+        const int maxTries = 10;
+        int Tries = 0;
+        string data = null;
+        while (Tries < maxTries)
         {
-            if (!IsClipboardFormatAvailable((uint)uFormat.CF_UNICODETEXT))
-                return null;
-            int Tries = 0;
-            var opened = false;
-            string data = null;
-            while (true)
+            ++Tries;
+            if (!OpenClipboard(IntPtr.Zero))
             {
-                ++Tries;
-                opened = OpenClipboard(IntPtr.Zero);
-                var hGlobal = GetClipboardData((uint)uFormat.CF_UNICODETEXT);
-                var lpwcstr = GlobalLock(hGlobal);
-                data = Marshal.PtrToStringUni(lpwcstr);
-                if (opened)
-                {
-                    GlobalUnlock(hGlobal);
-                    break;
-                }
                 System.Threading.Thread.Sleep(1);
+                continue;
             }
-            CloseClipboard();
-            return data;
+            try {
+                var hGlobal = GetClipboardData((uint)uFormat.CF_UNICODETEXT);
+                if (hGlobal == IntPtr.Zero)
+                    break;
+                var lpwcstr = GlobalLock(hGlobal);
+                if (lpwcstr != IntPtr.Zero)
+                    data = Marshal.PtrToStringUni(lpwcstr);
+                GlobalUnlock(hGlobal);
+            } finally {
+                CloseClipboard();
+            }
+            break;
         }
+        return data;
+    }
         public static ClipboardData GetClipboardDatas() // Gets all clipboard datas, but only text-based datas supported...
         {
             var cd = new ClipboardData()

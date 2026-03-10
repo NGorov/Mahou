@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
@@ -57,13 +57,14 @@ namespace Mahou {
 					GetModuleHandle(currModule.ModuleName), 0);
 			}
 		}
-		public static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
-			int vkCode = Marshal.ReadInt32(lParam);
-			var Key = (Keys)vkCode; // "Key" will further be used instead of "(Keys)vkCode"
-			// All other printables
-			bool allOtherPrintables = Key >= Keys.Oem1 && Key <= Keys.OemBackslash;
-			// This is 0-9 & A-Z
-			bool isAz09Key = (Key >= Keys.D0 && Key <= Keys.Z);
+	public static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
+		try {
+		int vkCode = Marshal.ReadInt32(lParam);
+		var Key = (Keys)vkCode; // "Key" will further be used instead of "(Keys)vkCode"
+		// All other printables
+		bool allOtherPrintables = Key >= Keys.Oem1 && Key <= Keys.OemBackslash;
+		// This is 0-9 & A-Z
+		bool isAz09Key = (Key >= Keys.D0 && Key <= Keys.Z);
 			#region Multiple last words convert
 			if(waitfornum && wParam == (IntPtr)(int)KMMessages.WM_KEYUP && !shift && !ctrl && !alt) {
 				waitfornum = false;
@@ -529,10 +530,14 @@ namespace Mahou {
 					tempNumpads.Add(Key);
 				}
 			}
-			#endregion
-			return CallNextHookEx(MMain._hookID, nCode, wParam, lParam);
+		#endregion
+		} catch(Exception ex) {
+			log.Error(ex, "Exception in keyboard HookCallback");
 		}
-		public static IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
+		return CallNextHookEx(MMain._hookID, nCode, wParam, lParam);
+	}
+	public static IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
+		try {
 			if(nCode >= 0) {
 				if((KMMessages.WM_LBUTTONDOWN == (KMMessages)(int)wParam) || KMMessages.WM_RBUTTONDOWN == (KMMessages)(int)wParam) {
 					MMain.c_word.Clear();
@@ -542,14 +547,17 @@ namespace Mahou {
 					}
 				}
 			}
-			return CallNextHookEx(MMain._mouse_hookID, nCode, wParam, lParam);
+		} catch(Exception ex) {
+			log.Error(ex, "Exception in MouseHookCallback");
 		}
+		return CallNextHookEx(MMain._mouse_hookID, nCode, wParam, lParam);
+	}
 		#endregion
 		#region Functions/Struct
-		static void ConvertSelection() //Converts selected text
-		{
-			Locales.IfLessThan2();
-			self = true;
+	static void ConvertSelection() //Converts selected text
+	{
+		if(Locales.IfLessThan2()) return;
+		self = true;
 			string ClipStr = "";
 			// Backup & Restore feature, now only text supported...
 			var doBackup = false || NativeClipboard.IsClipboardFormatAvailable((uint)NativeClipboard.uFormat.CF_UNICODETEXT);
@@ -733,9 +741,9 @@ namespace Mahou {
 				ctrlRP = false;
 			}
 		}
-		static void ConvertLast(List<YuKey> c_) //Converts last word/line
-		{
-			Locales.IfLessThan2();
+	static void ConvertLast(List<YuKey> c_) //Converts last word/line
+	{
+		if(Locales.IfLessThan2()) return;
 			YuKey[] YuKeys = c_.ToArray();
 			{
 				self = true;

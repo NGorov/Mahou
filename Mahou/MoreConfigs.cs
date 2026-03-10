@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -276,9 +276,9 @@ namespace Mahou
 			tempConMorWorKey = MMain.MyConfs.ReadInt("Hotkeys", "HKConvertMore");
 			tempConMorWorMods = MMain.MyConfs.Read("Hotkeys", "HKConvertMoreMods");
 		}
-		void RefreshLocales() // Refreshes locales in comboboxes
-		{
-			Locales.IfLessThan2();
+	void RefreshLocales() // Refreshes locales in comboboxes
+	{
+		if(Locales.IfLessThan2()) return;
 			MMain.locales = Locales.AllList();
 			cbLCLocalesList.Items.Clear();
 			cbRCLocalesList.Items.Clear();

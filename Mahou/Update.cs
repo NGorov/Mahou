@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -179,8 +179,9 @@ DEL ""%MAHOUDIR%UpdateMahou.cmd""";
 			}
 		}
 
-		async void btnCheck_Click(object sender, EventArgs e)
-		{
+	async void btnCheck_Click(object sender, EventArgs e)
+	{
+		try {
 			btnCheck.Visible = false;
 			lbChecking.Visible = true;
 			lbChecking.Text = MMain.UI[23];
@@ -191,10 +192,11 @@ DEL ""%MAHOUDIR%UpdateMahou.cmd""";
 				btnCheck.Visible = true;
 				tmr.Stop();
 			};
-			if (UpdInfo[2] == MMain.UI[31]) {
+			if (UpdInfo == null || UpdInfo.Length < 3 || UpdInfo[2] == MMain.UI[31]) {
 				lbChecking.Text = MMain.UI[34];
 				tmr.Start();
-				SetUInfo();
+				if(UpdInfo != null && UpdInfo.Length >= 3)
+					SetUInfo();
 				tmr.Tick += (_, __) => {
 					lbVer.Text = MMain.UI[25];
 					gpRTitle.Text = MMain.UI[26];
@@ -219,7 +221,12 @@ DEL ""%MAHOUDIR%UpdateMahou.cmd""";
 					SetUInfo();
 				}
 			}
+		} catch(Exception ex) {
+			log.Error(ex, "Error during update check");
+			lbChecking.Visible = false;
+			btnCheck.Visible = true;
 		}
+	}
 
 		async Task GetUpdateInfo() {
 		    log.Trace("Getting update info");
@@ -288,23 +295,25 @@ DEL ""%MAHOUDIR%UpdateMahou.cmd""";
 			
 			return myProxy;
 		}
-		public async void StartupCheck()
-		{
+	public async void StartupCheck()
+	{
+		try {
 			await GetUpdateInfo();
-			try {
-				if (flVersion("v" + Application.ProductVersion) < flVersion(UpdInfo[2])) {
-					if (MessageBox.Show(new Form() { TopMost = true },
-						     UpdInfo[0] + '\n' + UpdInfo[1], "Mahou - " + MMain.UI[33],
-						     MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.OK) {
-						MMain.mahou.update.StartPosition = FormStartPosition.CenterScreen;
-						fromStartup = true;
-						MMain.mahou.update.ShowDialog();
-						MMain.mahou.update.StartPosition = FormStartPosition.CenterParent;
-					}
+			if (UpdInfo != null && UpdInfo.Length > 2 &&
+				flVersion("v" + Application.ProductVersion) < flVersion(UpdInfo[2])) {
+				if (MessageBox.Show(new Form() { TopMost = true },
+					     UpdInfo[0] + '\n' + UpdInfo[1], "Mahou - " + MMain.UI[33],
+					     MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.OK) {
+					MMain.mahou.update.StartPosition = FormStartPosition.CenterScreen;
+					fromStartup = true;
+					MMain.mahou.update.ShowDialog();
+					MMain.mahou.update.StartPosition = FormStartPosition.CenterParent;
 				}
-			} catch {
 			}
+		} catch(Exception ex) {
+			log.Error(ex, "Error during startup update check");
 		}
+	}
 
 		void SetUInfo()
 		{
