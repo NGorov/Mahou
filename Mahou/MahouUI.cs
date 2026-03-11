@@ -4521,7 +4521,7 @@ DEL ""ExtractASD.cmd""";
 				tmr.Interval = 350;
 				tmr.Start();
 				AutoSwitchDictionaryRaw = dict;
-				this.txt_AutoSwitchDictionary.Invoke((MethodInvoker)delegate {
+				this.txt_AutoSwitchDictionary.Invoke((Action)delegate {
 					ChangeAutoSwitchDictionaryTextBox();
 					UpdateSnippetCountLabel(AutoSwitchDictionaryRaw, lbl_AutoSwitchWordsCount, false);
 				});

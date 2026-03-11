@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -1551,7 +1551,7 @@ namespace Mahou {
 					}
 		       		if (spaceAft && !expand.Contains("__cursorhere"))
 						KInputs.MakeInput(KInputs.AddString(" "));
-					DoLater(() => MMain.mahou.Invoke((MethodInvoker)delegate {
+					DoLater(() => MMain.mahou.Invoke((Action)delegate {
 						MMain.mahou.UpdateLDs();
 					}), snip.Length*2);
 		       	} catch(Exception e) {

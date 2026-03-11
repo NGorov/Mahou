@@ -165,7 +165,7 @@ namespace Mahou
 						mahou.icon.trIcon.ShowBalloonTip(1000, Lang[Languages.Element.UpdateComplete], "Mahou -> " + mahou.Text, ToolTipIcon.Info);
 						mahou.icon.trIcon.BalloonTipClicked += (_, __) => mahou.ToggleVisibility();
 						if (!MahouUI.TrayIconVisible)
-							KMHook.DoLater(() => mahou.Invoke((MethodInvoker)delegate { mahou.icon.trIcon.Visible = false; }), 1005);
+							KMHook.DoLater(() => mahou.Invoke((Action)delegate { mahou.icon.trIcon.Visible = false; }), 1005);
 					}
 				}
 				MyConfs.WriteToDisk();
