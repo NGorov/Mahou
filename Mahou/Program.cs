@@ -37,7 +37,7 @@ namespace Mahou
 		public static RawInputForm rif;
 	public static System.Threading.Timer _logTimer = new System.Threading.Timer((_) => { try { Logging.UpdateLog(); } catch (Exception ex) { Logging.Log("Error updating log, details:\r\n" + ex.Message);}}, null, 20, 300);
 	public static long _lastEventHookTick = DateTime.UtcNow.Ticks;
-	public static Timer _winEventHealthTimer;
+	public static System.Windows.Forms.Timer _winEventHealthTimer;
 	public static List<string> lcnmid = new List<string>();
 	#endregion
 		[STAThread] //DO NOT REMOVE THIS
@@ -148,7 +148,7 @@ namespace Mahou
 			                                     IntPtr.Zero, _evt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
 			_LDevt_hookID = WinAPI.SetWinEventHook(WinAPI.EVENT_OBJECT_FOCUS, WinAPI.EVENT_OBJECT_FOCUS,
 			                                     IntPtr.Zero, _LDevt_proc, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
-			_winEventHealthTimer = new Timer();
+		_winEventHealthTimer = new System.Windows.Forms.Timer();
 			_winEventHealthTimer.Interval = 30000;
 			_winEventHealthTimer.Tick += (_, __) => { ReRegisterWinEventHooksIfNeeded(); };
 			_winEventHealthTimer.Start();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -22,9 +22,9 @@ namespace Mahou {
 			keyAfterCTRLSHIFT, keyAfterALTSHIFT,
 			clickAfterCTRL, clickAfterALT, clickAfterSHIFT,
 			hotkeywithmodsfired, csdoing, incapt, waitfornum, 
-			IsHotkey, preSnip, LMB_down, RMB_down, MMB_down,
+			IsHotkey, ff_chr_wheeled, preSnip, LMB_down, RMB_down, MMB_down,
 			dbl_click, click, selfie, aftsingleAS, JKLERR, JKLERRchecking, last_snipANY,
-			snipselshiftpressed, snipselwassel, 
+			_selis, _mselis, snipselshiftpressed, snipselwassel, 
 			AS_IGN_BACK, AS_IGN_DEL, AS_IGN_LS, was_back, was_del, was_ls, __setsnip, L_DOWN, 
 			CLW_W_SPACE, CLW_W_ENTER, CTRL_ALT_changelayout_temporary, CTRL_ALT_Layout_loaded;
 		public static uint CTRL_ALT_prev_layout;
@@ -893,13 +893,12 @@ namespace Mahou {
 				}
 			}
 		}
-	public static void LDEventHook(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
-	                                     int idChild, uint dwEventThread, uint dwmsEventTime) {
-		try {
+		public static void LDEventHook(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
+		                                     int idChild, uint dwEventThread, uint dwmsEventTime) {
 //			if (MahouUI.LDUseWindowsMessages) {
-			if (eventType == WinAPI.EVENT_OBJECT_FOCUS) {
-				Logging.Log("[Event] EVENT_OBJECT_FOCUS");
-				if (MMain.mahou != null) {
+				if (eventType == WinAPI.EVENT_OBJECT_FOCUS) {
+					Logging.Log("[Event] EVENT_OBJECT_FOCUS");
+					if (MMain.mahou != null) {
 //						if (MahouUI.CaretLangTooltipEnabled) {
 //							var _fw = WinAPI.GetForegroundWindow();
 //							var _clsNMb = new StringBuilder(40);
@@ -908,30 +907,25 @@ namespace Mahou {
 //							if (clsNM != "MozillaWindowClass" || !clsNM.Contains("mozilla") || !clsNM.Contains("Chrome_WidgetWin"))
 //								ff_chr_wheeled = false;
 //						}
-					// Switching windows doesn't trigger layout switch event for some reason, or
-					// maybe it's just isn't received through JKL, that's why Mahou will think
-					// that layout is still the same as it was before switching windows,
-					// you can disable that in windows 10, i.e. uncheck the:						
-					// let me use a different input method for each app window
-					// this will revert the JKL's last result, so kind of forced
-					// ignore last JKL on focus change
-					var before = MahouUI.currentLayout;
-					MahouUI.currentLayout = Locales.GetCurrentLocale();
-					Logging.Log("Force update currentLayout on focus change: " + MahouUI.currentLayout + ", prev(possibly wrong if JKL enabled): " + before);
-					MMain.mahou.UpdateLDs();
+						// Switching windows doesn't trigger layout switch event for some reason, or
+						// maybe it's just isn't received through JKL, that's why Mahou will think
+						// that layout is still the same as it was before switching windows,
+						// you can disable that in windows 10, i.e. uncheck the:						
+						// let me use a different input method for each app window
+						// this will revert the JKL's last result, so kind of forced
+						// ignore last JKL on focus change
+						var before = MahouUI.currentLayout;
+						MahouUI.currentLayout = Locales.GetCurrentLocale();
+						Logging.Log("Force update currentLayout on focus change: " + MahouUI.currentLayout + ", prev(possibly wrong if JKL enabled): " + before);
+						MMain.mahou.UpdateLDs();
+					}
+					//MahouUI.CCReset("object-focus");
 				}
-				//MahouUI.CCReset("object-focus");
-			}
 //			}
-		} catch (Exception ex) {
-			Logging.Log("LDEventHook error: " + ex.Message + "\r\n" + ex.StackTrace, 1);
 		}
-	}
-	public static void EventHookCallback(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
-	                                       int idChild, uint dwEventThread, uint dwmsEventTime) {
-		try {
-			System.Threading.Interlocked.Exchange(ref MMain._lastEventHookTick, DateTime.UtcNow.Ticks);
-			MahouUI.CCReset("fg-window-change");
+		public static void EventHookCallback(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject,
+		                                       int idChild, uint dwEventThread, uint dwmsEventTime) {
+				MahouUI.CCReset("fg-window-change");
 			if (MahouUI.PersistentLayoutOnWindowChange) {
 				var proc = Locales.ActiveWindowProcess();
 				var cont = PLC_HWNDs.Contains(hwnd);
@@ -970,6 +964,7 @@ namespace Mahou {
 				}
 			}
 			if (!MahouUI.UseJKL || KMHook.JKLERR) {
+				// Only if JKL is not enabled/working, also for console apps use getconbkl.dll in ↓ which works only in x86
 				MahouUI.currentLayout = /*MahouUI.GlobalLayout =*/ conhost ? Locales.GetCurrentLocale() : hwndLayout;
 				Logging.Log("[FOCUS] > Updating currentLayout on window activate to ["+MahouUI.currentLayout+"]...");
 			}
@@ -990,10 +985,7 @@ namespace Mahou {
 				Logging.Log("[WinCh-HK] Enabled win-hotkeys.");
 				MMain.mahou.RegisterHotkeys();
 			}
-		} catch (Exception ex) {
-			Logging.Log("EventHookCallback error: " + ex.Message + "\r\n" + ex.StackTrace, 1);
 		}
-	}
 		#endregion
 		#region Functions/Struct
 		static void snipsel() {
@@ -2086,16 +2078,12 @@ namespace Mahou {
 //			Logging.Log("OS: " +Environment.OSVersion.Version);
 			return Environment.OSVersion.Version.Major == 10 || (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor > 1);
 		}
-	public static void DoLater(Action act, int timeout) {
-		System.Threading.Tasks.Task.Factory.StartNew(() => {
-			try {
-				Thread.Sleep(timeout);
-				act();
-			} catch (Exception ex) {
-				Logging.Log("DoLater error: " + ex.Message + "\r\n" + ex.StackTrace, 1);
-			}
-		});
-	}
+		public static void DoLater(Action act, int timeout) {
+			System.Threading.Tasks.Task.Factory.StartNew(() => {
+			                                             	Thread.Sleep(timeout);
+			                                             	act();
+			                                             });
+		}
 		public static string GetModsStr(bool c,bool cr, bool s, bool sr, bool a, bool ar, bool w, bool wr) {
 			var modstr = new StringBuilder();
 			if(c) { modstr.Append("LCtrl + "); }
@@ -3311,21 +3299,17 @@ namespace Mahou {
 			if (selfie) {
 				Logging.Log(pt+"Inside "+busy_on+" called: "+mn);
 				self_action();
-		} else {
-			Debug.WriteLine(pt+ mn);
+			} else {
+				Debug.WriteLine(pt+ mn);
 //				MMain.mahou.Invoke((MethodInvoker)delegate {
-			if (LLHook._ACTIVE)  { LLHook.UnSet(); } 
-			if (MMain.mahou != null) { MMain.mahou.UnregisterHotkeys(); }
+				if (LLHook._ACTIVE)  { LLHook.UnSet(); } 
+				if (MMain.mahou != null) { MMain.mahou.UnregisterHotkeys(); }
 //			});
-			if (MMain.rif != null)
-				MMain.rif.RegisterRawInputDevices(IntPtr.Zero, WinAPI.RawInputDeviceFlags.Remove);
-			selfie = true;
-			busy_on = mn;
-			try {
+				if (MMain.rif != null)
+					MMain.rif.RegisterRawInputDevices(IntPtr.Zero, WinAPI.RawInputDeviceFlags.Remove);
+				selfie = true;
+				busy_on = mn;
 				self_action();
-			} catch (Exception ex) {
-				Logging.Log(pt + "exception in " + mn + ": " + ex.Message + "\r\n" + ex.StackTrace, 1);
-			} finally {
 //				MMain.mahou.Invoke((MethodInvoker)delegate {
 				if (LLHook._ACTIVE) { LLHook.Set(); }
 				if (MMain.mahou != null) { MMain.mahou.RegisterHotkeys(); }
@@ -3335,7 +3319,6 @@ namespace Mahou {
 				selfie = false;
 				Debug.WriteLine(pt+ "end " + mn);
 			}
-		}
 		}
 		public static void StartConvertWord(YuKey[] YuKeys, uint wasLocale, bool skipsnip = false, bool last = false) {
 			if (YuKeys.Length == 0) {
