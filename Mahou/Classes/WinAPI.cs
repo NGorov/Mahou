@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -41,7 +41,7 @@ public static class WinAPI {
 	public struct RAWINPUT {
 		public RAWINPUTHEADER Header;
         [StructLayout(LayoutKind.Explicit)]
-		public struct data {
+		public struct RawInputData {
         	[FieldOffset(0)]
 			public RAWKEYBOARD Keyboard;
             [FieldOffset(0)]
@@ -49,7 +49,7 @@ public static class WinAPI {
 			[FieldOffset(0)]
 			public RAWHID Hid;
 		}
-		public data Data;
+		public RawInputData Data;
 	}
 	[StructLayout(LayoutKind.Sequential)]
     public struct RAWINPUTHEADER {
@@ -134,7 +134,7 @@ public static class WinAPI {
         /// </summary>
         public RawMouseFlags Flags;
         [StructLayout(LayoutKind.Explicit)]
-        public struct data {
+        public struct RawMouseData {
             [FieldOffset(0)]
             public uint Buttons;
             /// <summary>
@@ -148,7 +148,7 @@ public static class WinAPI {
             [FieldOffset(0)]
             public RawMouseButtons ButtonFlags;
         }
-        public data Data;
+        public RawMouseData Data;
         /// <summary>
         /// Raw button data.
         /// </summary>

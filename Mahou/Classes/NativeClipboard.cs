@@ -43,11 +43,11 @@ namespace Mahou
             return data;
         }
         /// <summary> Clipboard data/formats in two lists.</summary>
-		public class clip {
+		public class Clip {
 			public int Count;
 			public List<uint> f;
 			public List<byte[]> d;
-			public clip() {
+			public Clip() {
 				f = new List<uint>();
 				d = new List<byte[]>();
 				Count = 0;
@@ -85,7 +85,7 @@ namespace Mahou
 //				}
 //			}
 		}
-		public static void clip_set(clip c) {
+		public static void clip_set(Clip c) {
         	if (c == null) return;
         	if (c.Count == 0) return;
 			WinAPI.OpenClipboard(IntPtr.Zero);
@@ -102,8 +102,8 @@ namespace Mahou
 			}
 			WinAPI.CloseClipboard();
 		}
-		public static clip clip_get() {
-        	clip c;
+		public static Clip clip_get() {
+        	Clip c;
     		var open = WinAPI.OpenClipboard(IntPtr.Zero);
 			if (!open) {
     			WinAPI.CloseClipboard();
@@ -111,7 +111,7 @@ namespace Mahou
 				return null;
 			}
 			int size = 0, all_size = 0;
-			c = new clip();
+			c = new Clip();
 			IntPtr hglob = IntPtr.Zero;//, all;
 			IntPtr glock = IntPtr.Zero;
 			uint format, dib_skip = 0;

@@ -225,8 +225,7 @@ namespace Mahou {
 			txt_Snippets.Text = "-><"+KMHook.__ANY__+">====><"+KMHook.__ANY__+">__cursorhere()</"+KMHook.__ANY__+"><====\r\n->mahou\r\n====>Mahou (魔法) - Magical layout switcher.<====\r\n->eml\r\n====>BladeMight@" +
 	"gmail.com<====\r\n->nowtime====>__date(HH:mm:ss)<====\r\n->nowdate====>__date(dd/MM/yyyy)<====\r\n->datepretty====>__date(dd, ddd MMM)<===="+
 	"\r\n->mahouver====>__version()<====\r\n->mahoutitle====>__title()<====\r\n->env_system====>__system()<====\r\n->date_esc====>\\__date(HH:mm:ss)<====";
-			// Switch to more secure connection.
-			ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+			
 			nud_LangTTPositionX.Minimum = nud_LangTTPositionY.Minimum = -100;
            	LoadConfigs();
 			InitializeListBoxes();
@@ -273,6 +272,7 @@ namespace Mahou {
 			if (MMain.MyConfs.ReadBool("Functions", "StartupUpdatesCheck")) {
 				uche = new System.Threading.Thread(StartupCheck);
 				uche.Name = "Startup Check";
+				uche.IsBackground = true;
 				uche.Start();
 				showUpdWnd.Tick += (_, __) => {
 					Logging.Log("Checking: " + AtUpdateShow);
@@ -3532,8 +3532,8 @@ DEL """+restartMahouPath + @"""";
 			if (MMain._winEventHealthTimer != null) { MMain._winEventHealthTimer.Stop(); MMain._winEventHealthTimer.Dispose(); }
 			if (MMain._evt_hookID != IntPtr.Zero) { WinAPI.UnhookWinEvent(MMain._evt_hookID); MMain._evt_hookID = IntPtr.Zero; }
 			if (MMain._LDevt_hookID != IntPtr.Zero) { WinAPI.UnhookWinEvent(MMain._LDevt_hookID); MMain._LDevt_hookID = IntPtr.Zero; }
-			if (uche != null)
-				uche.Abort();
+			if (uche != null && uche.IsAlive)
+				uche.Join(1000);
 			if (tmr != null) { tmr.Stop(); tmr.Dispose(); }
 			if (old != null) { old.Stop(); old.Dispose(); }
 			if (res != null) { res.Stop(); res.Dispose(); }
