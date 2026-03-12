@@ -221,7 +221,7 @@ namespace Mahou {
 				chk_AppDataConfigs.Enabled = false;
 			}
 			// Visual designer always wants to put that string into resources, blast it!
-			txt_Snippets.Text = "-><"+KMHook.__ANY__+">====><"+KMHook.__ANY__+">__cursorhere()</"+KMHook.__ANY__+"><====\r\n->mahou\r\n====>Mahou (魔法) - Magical layout switcher.<====\r\n->eml\r\n====>BladeMight@" +
+			txt_Snippets.Text = "-><"+KMHook.__ANY__+">====><"+KMHook.__ANY__+">__cursorhere()</"+KMHook.__ANY__+"><====\r\n->mahou\r\n====>Mahou layout switcher.<====\r\n->eml\r\n====>ngorov83@" +
 	"gmail.com<====\r\n->nowtime====>__date(HH:mm:ss)<====\r\n->nowdate====>__date(dd/MM/yyyy)<====\r\n->datepretty====>__date(dd, ddd MMM)<===="+
 	"\r\n->mahouver====>__version()<====\r\n->mahoutitle====>__title()<====\r\n->env_system====>__system()<====\r\n->date_esc====>\\__date(HH:mm:ss)<====";
 			

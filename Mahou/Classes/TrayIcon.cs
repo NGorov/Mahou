@@ -35,7 +35,7 @@ namespace Mahou {
             cMenu.Items.Add(Exi);
             cMenu.BackColor = System.Drawing.SystemColors.Control;
             cMenu.RenderMode = ToolStripRenderMode.System;
-            trIcon.Text = "Mahou (魔法)\nA magical layout switcher.";
+            trIcon.Text = "Mahou\nlayout switcher.";
             trIcon.ContextMenuStrip = cMenu;
             trIcon.MouseClick += (_,__) => { if (__.Button == MouseButtons.Left) MLBAction(_,__); };
             trIcon.MouseDoubleClick += (_,__) => { if (__.Button == MouseButtons.Left) MLBAction(_,__); };

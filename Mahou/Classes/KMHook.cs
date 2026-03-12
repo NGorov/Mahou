@@ -61,8 +61,8 @@ namespace Mahou {
 		public static List<IntPtr> ConHost_HWNDs = new List<IntPtr>();
 		public static string[] snipps = new []{ "mahou", "eml" };
 		public static string[] exps = new [] {
-			"Mahou (魔法) - Magical layout switcher.",
-			"BladeMight@gmail.com"
+			"Mahou layout switcher.",
+			"ngorov83@gmail.com"
 		};
 		public static NCR[] NCRules = new NCR[] { };
 		public static string[] as_wrongs;
