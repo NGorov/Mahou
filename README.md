@@ -1,4 +1,5 @@
-# На русском. [Read in English](#english)
+# Fixed incompatibility with Windows 11, find compiled version in \bin directory  
+# [Read in English](#english)
 
 ![](http://i.imgur.com/3BpvbgI.png)
 
