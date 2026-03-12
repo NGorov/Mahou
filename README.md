@@ -1,4 +1,6 @@
-# Fixed incompatibility with Windows 11, find compiled version in \bin directory  
+# - errors, causing crashes, fixed;
+# - stability improved, works with Windows 11;
+# - compiled version in \bin directory.  
 # [Read in English](#english)
 
 ![](http://i.imgur.com/3BpvbgI.png)
