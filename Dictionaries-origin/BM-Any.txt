@@ -1,4 +1,4 @@
-﻿# Dictionary that BladeMight write on its own. almost.
+# Dictionary that NGorov write on its own. almost.
 ->tcnm
 ====>есть<====
 ->скщц

@@ -1,4 +1,4 @@
-﻿// File created by BladeMight in 22.06.2017-17:48
+// File created by NGorov 14.03.2026
 namespace Mahou
 {
 	partial class LangPanel

@@ -1,11 +1,11 @@
 #!/bin/bash
 # First run the Mahou/build-all.cmd
 if [ ! -d "BUILD" ]; then echo "No assets..."; exit 0; fi
-API='https://gitea.com/api/v1/repos/BladeMight/Mahou/'
+API='https://api.github.com/repos/NGorov/Mahou/'
 TAG="latest-commit"
-TOKEN="$(<~/.gitea)"
+TOKEN="$(<~/.github_token)"
 CSH=$(git log -1 --pretty=format:%h)
-BID=$(git rev-list --count master)
+BID=$(git rev-list --count main)
 body=$(git log -1 | tail -n +5 | jq -R -s '.')
 name="latest commit release ([$CSH] build #$BID)"
 data="{ 

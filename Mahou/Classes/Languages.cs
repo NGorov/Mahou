@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 public class Languages
 {
@@ -501,7 +501,7 @@ public class Languages
 		{ Element.ProxyLogin, "Login:" }, 
 		{ Element.ProxyPass, "Password:" }, 
 		{ Element.Error, "Error..." }, 
-		{ Element.NetError, "Connection to gitea.com can't be established, check your network connection or proxy settings..." },
+		{ Element.NetError, "Connection to github.com can't be established, check your network connection or proxy settings..." },
 		{ Element.UpdatesChannel, "Updates channel:" },
 		#endregion
 		#region About
@@ -555,7 +555,7 @@ public class Languages
 		{ Element.UpdateFound, "New version available!" }, 
 		{ Element.UpdateComplete, "Mahou successfully updated!" }, 
 		{ Element.ShowHide, "Show" }, 
-		{ Element.Mahou, "Mahou layout switcher." }, 
+		{ Element.Mahou, "Mahou layout switcher" }, 
 		{ Element.Download, "Download" }, 
 		{ Element.ConfigsCannot, "Configs file Mahou.ini cannot be " },
 		{ Element.Created, "created" },
@@ -839,7 +839,7 @@ Specify layout code 0 to disable this feature." },
 		{ Element.ProxyLogin, "Логин:" }, 
 		{ Element.ProxyPass, "Пароль:" }, 
 		{ Element.Error, "Ошибка..." }, 
-		{ Element.NetError, "Соединение с gitea.com не может быть установлено, " +
+		{ Element.NetError, "Соединение с github.com не может быть установлено, " +
 			"проверьте подключение к Интернету или ваши настройки прокси..."}, 
 		{ Element.UpdatesChannel, "Канал обновлений:" },
 		#endregion

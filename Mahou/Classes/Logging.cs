@@ -1,4 +1,4 @@
-// Created by BladeMight in 05.12.2016-18:55
+// Created by NGorov 14.03.2026
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;

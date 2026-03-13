@@ -8,11 +8,11 @@ using System.Resources;
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle ("Mahou")]
-[assembly: AssemblyDescription ("A magic layout switcher.")]
+[assembly: AssemblyDescription ("A magic layout switcher")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("BladeMight")]
+[assembly: AssemblyCompany ("NGorov")]
 [assembly: AssemblyProduct ("Mahou")]
-[assembly: AssemblyCopyright ("Copyright © BladeMight 2019")]
+[assembly: AssemblyCopyright ("Copyright © NGorov 2026")]
 [assembly: AssemblyTrademark ("BM")]
 [assembly: AssemblyCulture ("")]
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
@@ -31,8 +31,8 @@ using System.Resources;
 // Можно задать все значения или принять номер построения и номер редакции по умолчанию, 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion ("3.0.1.0")]
-[assembly: AssemblyFileVersion ("3.0.1.0")]
+[assembly: AssemblyVersion ("3.0.0.0")]
+[assembly: AssemblyFileVersion ("3.0.0.0")]
 [assembly: NeutralResourcesLanguage ("")]
-[assembly: AssemblyDefaultAlias ("BladeMight")]
+[assembly: AssemblyDefaultAlias ("NGorov")]
 [assembly: SupportedOSPlatform ("windows7.0")]

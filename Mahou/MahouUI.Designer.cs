@@ -1,4 +1,4 @@
-﻿
+
 namespace Mahou
 {
 	partial class MahouUI
@@ -4142,7 +4142,7 @@ namespace Mahou
 			this.lnk_Email.Size = new System.Drawing.Size(136, 15);
 			this.lnk_Email.TabIndex = 3;
 			this.lnk_Email.TabStop = true;
-			this.lnk_Email.Text = "BladeMight@gmail.com";
+			this.lnk_Email.Text = "ngorov83@gmail.com";
 			this.lnk_Email.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.Lnk_EmailLinkClicked);
 			// 
 			// lnk_Wiki

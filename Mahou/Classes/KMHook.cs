@@ -61,7 +61,7 @@ namespace Mahou {
 		public static List<IntPtr> ConHost_HWNDs = new List<IntPtr>();
 		public static string[] snipps = new []{ "mahou", "eml" };
 		public static string[] exps = new [] {
-			"Mahou layout switcher.",
+			"Mahou layout switcher",
 			"ngorov83@gmail.com"
 		};
 		public static NCR[] NCRules = new NCR[] { };

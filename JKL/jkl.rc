@@ -10,12 +10,12 @@ BEGIN
     BEGIN
         BLOCK "040904E4"
         BEGIN
-            VALUE "CompanyName",      "BladeMight"
+            VALUE "CompanyName",      "NGorov"
             VALUE "FileDescription",  "JKL - Just Keyboard Layout Monitor"
             VALUE "FileVersion",      "1.0"
             VALUE "InternalName",     "JKL"
             VALUE "OriginalFilename", "jkl(arch).(ext)"
-			VALUE "LegalCopyright",   "BladeMight"
+			VALUE "LegalCopyright",   "NGorov"
             VALUE "ProductName",      "Mahou - Magical layout switcher"
             VALUE "ProductVersion",   "various"
         END

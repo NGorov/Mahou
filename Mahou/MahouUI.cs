@@ -221,7 +221,7 @@ namespace Mahou {
 				chk_AppDataConfigs.Enabled = false;
 			}
 			// Visual designer always wants to put that string into resources, blast it!
-			txt_Snippets.Text = "-><"+KMHook.__ANY__+">====><"+KMHook.__ANY__+">__cursorhere()</"+KMHook.__ANY__+"><====\r\n->mahou\r\n====>Mahou layout switcher.<====\r\n->eml\r\n====>ngorov83@" +
+			txt_Snippets.Text = "-><"+KMHook.__ANY__+">====><"+KMHook.__ANY__+">__cursorhere()</"+KMHook.__ANY__+"><====\r\n->mahou\r\n====>Mahou layout switcher<====\r\n->eml\r\n====>ngorov83@" +
 	"gmail.com<====\r\n->nowtime====>__date(HH:mm:ss)<====\r\n->nowdate====>__date(dd/MM/yyyy)<====\r\n->datepretty====>__date(dd, ddd MMM)<===="+
 	"\r\n->mahouver====>__version()<====\r\n->mahoutitle====>__title()<====\r\n->env_system====>__system()<====\r\n->date_esc====>\\__date(HH:mm:ss)<====";
 			
@@ -237,7 +237,8 @@ namespace Mahou {
 			pan_TrSets.AutoScroll = pan_KeySets.AutoScroll = false;
 			pan_TrSets.HorizontalScroll.Maximum = pan_KeySets.HorizontalScroll.Maximum = 0;
 			pan_TrSets.AutoScroll = pan_KeySets.AutoScroll = true;
-			Text = "Mahou " + Assembly.GetExecutingAssembly().GetName().Version;
+			var _ver = Assembly.GetExecutingAssembly().GetName().Version;
+			Text = "Mahou " + _ver.Major + "." + _ver.Minor;
 			Text += "-dev";
 			if (____.commit != "") {
 				Text += " <"+____.commit+">";
@@ -264,7 +265,8 @@ namespace Mahou {
 			tabs.Height += pty;
 			Height += pty;
 			#if GITHUB_RELEASE
-			Text = "Mahou " + Assembly.GetExecutingAssembly().GetName().Version;
+			var _rver = Assembly.GetExecutingAssembly().GetName().Version;
+			Text = "Mahou " + _rver.Major + "." + _rver.Minor;
 			#endif
 			RegisterHotkeys();
 			//Background startup check for updates
@@ -4324,14 +4326,14 @@ DEL /Q /F /A ""%TEMP%\UpdateMahou.cmd""";
 		string getASD_RemoteSize(bool InZip = false) {
 			try {
 				if (InZip) {
-					var data = getResponce("https://gitea.com/api/v1/repos/BladeMight/Mahou/releases/tags/latest-commit"); 
+					var data = getResponce("https://api.github.com/repos/NGorov/Mahou/releases/tags/latest-commit"); 
 					if (!String.IsNullOrEmpty(data)) {
 						var siz = (Int32.Parse(Regex.Match(data, "\"AS_Dict\\.zip.*?\"size\":\\s*(\\d+)").Groups[1].Value) / 1024 / 1024) + " MB";
 						Logging.Log("Remote size of AS_dict: " + siz);
 						return siz;
 					} else throw new Exception(MMain.Lang[Languages.Element.NetError]);
 				} 
-				var request = (HttpWebRequest)WebRequest.Create("https://gitea.com/BladeMight/Mahou/raw/branch/master/AS_dict.txt");
+				var request = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/NGorov/Mahou/main/AS_dict.txt");
 				if (!String.IsNullOrEmpty(txt_ProxyServerPort.Text)) {
 					request.Proxy = MakeProxy();
 				}
@@ -4411,7 +4413,7 @@ DEL /Q /F /A ""%TEMP%\UpdateMahou.cmd""";
 						if (!String.IsNullOrEmpty(txt_ProxyServerPort.Text)) {
 							wc.Proxy = MakeProxy();
 						}
-						wc.DownloadFile(new Uri("https://gitea.com/BladeMight/Mahou/releases/download/latest-commit/AS_dict.zip"), zip);
+						wc.DownloadFile(new Uri("https://github.com/NGorov/Mahou/releases/download/latest-commit/AS_dict.zip"), zip);
 						var ExtractASD = @"@ECHO OFF
 chcp 65001
 ECHO With CreateObject(""Shell.Application"") > ""unzip.vbs""
@@ -4436,7 +4438,7 @@ DEL ""ExtractASD.cmd""";
 						File.Delete(Path.Combine(Path.GetTempPath(), "AS_dict.txt"));
                  	}
 			} else
-				resp = getResponce("https://raw.githubusercontent.com/BladeMight/Mahou/master/AS_dict.txt");
+				resp = getResponce("https://raw.githubusercontent.com/NGorov/Mahou/main/AS_dict.txt");
 			btn_UpdateAutoSwitchDictionary.Text = MMain.Lang[Languages.Element.Checking];
 			var dict = Regex.Replace(resp, "\r?\n", Environment.NewLine);
 			tmr.Interval = 300;
@@ -4485,7 +4487,7 @@ DEL ""ExtractASD.cmd""";
 		/// </summary>
 		void GetUpdateInfo() {
 			var Info = new string[5] {"","","","",""} ; // Update info
-			var api = "https://gitea.com/api/v1/repos/BladeMight/Mahou/releases";
+			var api = "https://api.github.com/repos/NGorov/Mahou/releases";
 			var url = api+"/latest";
 			var beta = MMain.MyConfs.Read("Updates", "Channel") != "Stable";
 			if (beta) {
@@ -5165,22 +5167,22 @@ DEL ""ExtractASD.cmd""";
 			__lopen(Logging.log, "txt", e.Button == MouseButtons.Right);
 		}
 		void Lnk_RepositoryLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("https://gitea.com/BladeMight/Mahou", "http", false, e.Button == MouseButtons.Right);
+			__lopen("https://github.com/NGorov/Mahou", "http", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_SiteLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("https://gitea.com/BladeMight/Mahou/", "http", false, e.Button == MouseButtons.Right);
+			__lopen("https://github.com/NGorov/Mahou/", "http", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_WikiLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("https://gitea.com/BladeMight/Mahou/wiki", "http", false, e.Button == MouseButtons.Right);
+			__lopen("https://github.com/NGorov/Mahou/wiki", "http", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_ReleasesLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("https://gitea.com/BladeMight/Mahou/releases", "http", false, e.Button == MouseButtons.Right);
+			__lopen("https://github.com/NGorov/Mahou/releases", "http", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_EmailLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("mailto:BladeMight@gmail.com", "mailto", false, e.Button == MouseButtons.Right);
+			__lopen("mailto:ngorov83@gmail.com", "mailto", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_pluginLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			__lopen("https://gitea.com/BladeMight/MahouCaretDisplayServer", "http", false, e.Button == MouseButtons.Right);
+			__lopen("https://github.com/NGorov/MahouCaretDisplayServer", "http", false, e.Button == MouseButtons.Right);
 		}
 		void Lnk_SnipOpenLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
 			__lopen(snipfile, "txt");
