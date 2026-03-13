@@ -3318,71 +3318,6 @@ DEL """+restartMahouPath + @"""";
 			else
 				langPanelRefresh.Dispose();
 		}
-		void AutoStartTask(bool deleteonly = false) {
-			var xml = @"<?xml version=""1.0"" encoding=""UTF-16""?>
-<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
-  <RegistrationInfo>
-    <Date>2017-08-16T15:11:10.596</Date>
-    <Author>Kirin\BladeMight</Author>
-    <Description>Starts Mahou with highest priveleges.</Description>
-  </RegistrationInfo>
-  <Triggers>
-    <LogonTrigger>
-      <Enabled>true</Enabled>
-    </LogonTrigger>
-    <BootTrigger>
-      <Enabled>true</Enabled>
-    </BootTrigger>
-  </Triggers>
-  <Principals>
-    <Principal id=""Author"">
-      <UserId>" + Environment.UserDomainName + "\\" + Environment.UserName + @"</UserId>
-      <LogonType>InteractiveToken</LogonType>
-      <RunLevel>HighestAvailable</RunLevel>
-    </Principal>
-  </Principals>
-  <Settings>
-    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
-    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
-    <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
-    <AllowHardTerminate>true</AllowHardTerminate>
-    <StartWhenAvailable>true</StartWhenAvailable>
-    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
-    <IdleSettings>
-      <StopOnIdleEnd>true</StopOnIdleEnd>
-      <RestartOnIdle>false</RestartOnIdle>
-    </IdleSettings>
-    <AllowStartOnDemand>true</AllowStartOnDemand>
-    <Enabled>true</Enabled>
-    <Hidden>false</Hidden>
-    <RunOnlyIfIdle>false</RunOnlyIfIdle>
-    <WakeToRun>false</WakeToRun>
-    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
-    <Priority>7</Priority>
-  </Settings>
-  <Actions Context=""Author"">
-    <Exec>
-      <Command>" + "\"" + Assembly.GetExecutingAssembly().Location + "\"" + @"</Command>
-    </Exec>
-  </Actions>
-</Task>";
-			var xml_path = Path.Combine(Path.GetTempPath(), "MahouStartup+.xml");
-			System.Threading.Tasks.Task.Factory.StartNew(() => File.WriteAllText(xml_path, xml)).Wait();
-			var pif = new ProcessStartInfo { 
-				FileName = "schtasks.exe",
-				WindowStyle = ProcessWindowStyle.Hidden,
-				Arguments = "/delete /TN MahouAutostart+ /f",
-				CreateNoWindow = true,
-				UseShellExecute = true,
-				Verb = "runas"
-			};
-			Process.Start(pif).WaitForExit();
-			if (!deleteonly) {
-				pif.Arguments = "/create /xml \"" + xml_path + "\" /TN MahouAutostart+";
-				Process.Start(pif).WaitForExit();
-			}
-			File.Delete(xml_path);
-		}
 		public static void SoundPlay(bool second = false) {
 			if (SoundEnabled) {
 				byte[] snd = second ? Properties.Resources.snd2 : Properties.Resources.snd;
@@ -3420,26 +3355,26 @@ DEL """+restartMahouPath + @"""";
 		/// </summary>
 		void CreateAutoStart() {
 			if (AutoStartAsAdmin) {
-				AutoStartRemove(true);
-				AutoStartTask();
-//				if (AutoStartExist(false))
-//					AutoStartRemove(false);
-				Logging.Log("Startup task created.");
-			} else {
 				AutoStartRemove(false);
-				var exelocation = Assembly.GetExecutingAssembly().Location;
+				if (StartupTaskManager.EnsureCurrentUserLogonTask())
+					Logging.Log("Startup task created.");
+				else
+					Logging.Log("Startup task was not created.", 1);
+			} else {
+				AutoStartRemove(true);
+				var exelocation = StartupTaskManager.GetCurrentExecutablePath();
 	 			var shortcutLocation = Path.Combine(
 	 				                       Environment.GetFolderPath(Environment.SpecialFolder.Startup),
 	 				                       "Mahou.lnk");
 	 			if (File.Exists(shortcutLocation))
-	 				return;
+	 				File.Delete(shortcutLocation);
 	 			Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object
 	 			dynamic shell = Activator.CreateInstance(t);
 	 			try {
 	 				var lnk = shell.CreateShortcut(shortcutLocation);
 	 				try {
 	 					lnk.TargetPath = exelocation;
-	 					lnk.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+	 					lnk.WorkingDirectory = Path.GetDirectoryName(exelocation);
 	 					lnk.IconLocation = exelocation + ", 0";
 	 					lnk.Description = "Mahou - Magic layout switcher";
 	 					lnk.Save();
@@ -3456,47 +3391,28 @@ DEL """+restartMahouPath + @"""";
 		}
 		bool AutoStartExist(bool admin) {
 			if (admin) {
-				var pif = new Process {
-					StartInfo = new ProcessStartInfo {
-						FileName = "cmd.exe",
-						Arguments = "/c schtasks.exe /query /TN MahouAutoStart+ >NUL 2>&1 && echo Y",
-						RedirectStandardOutput = true,
-						CreateNoWindow = true,
-						UseShellExecute = false
-					}
-				};
-				pif.Start();
-				while (!pif.StandardOutput.EndOfStream) {
-					var l = pif.StandardOutput.ReadLine();
-					if (l.Contains("Y")) {
-						Debug.WriteLine("Task exist!");
-						pif.StartInfo.Arguments = "/c schtasks.exe /query /TN MahouAutoStart+ /fo LIST /v";
-						pif.Start();
-						Debug.WriteLine("Checking task path...");
-						while (!pif.StandardOutput.EndOfStream) {
-							l = pif.StandardOutput.ReadLine();
-							if (l.Contains(Assembly.GetExecutingAssembly().Location)) {
-								Debug.WriteLine("Task path OK! in: " + l);
-								pif.Dispose();
-								return true;
-							}
-						}
-					}
-				}
-				Debug.WriteLine("Task path wrong!");
-				pif.Dispose();
-				return false;
+				return StartupTaskManager.IsCurrentUserLogonTaskRegistered();
 			}
 			var lnk = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Mahou.lnk");
 			bool actual = false;
+			var currentExecutablePath = StartupTaskManager.GetCurrentExecutablePath();
 			if (File.Exists(lnk)) {
- 				Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object
+	 				Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object
 	 			dynamic shell = Activator.CreateInstance(t);
 	 			try {
 	 				var slnk = shell.CreateShortcut(lnk);
 	 				try {
-	 					if (slnk.TargetPath == Assembly.GetExecutingAssembly().Location)
-	 						actual = true;
+	 					var targetPath = Convert.ToString(slnk.TargetPath);
+	 					if (!string.IsNullOrWhiteSpace(targetPath)) {
+	 						try {
+	 							actual = StringComparer.OrdinalIgnoreCase.Equals(
+	 								Path.GetFullPath(targetPath),
+	 								currentExecutablePath
+	 							);
+	 						} catch {
+	 							actual = StringComparer.OrdinalIgnoreCase.Equals(targetPath, currentExecutablePath);
+	 						}
+	 					}
 	 				} finally {
 	 					Marshal.FinalReleaseComObject(slnk);
 	 				}
@@ -3512,8 +3428,10 @@ DEL """+restartMahouPath + @"""";
 		/// </summary>
 		void AutoStartRemove(bool admin) {
 			if (admin) {
-				AutoStartTask(true);
-				Logging.Log("Startup task removed.");
+				if (StartupTaskManager.RemoveCurrentUserLogonTask())
+					Logging.Log("Startup task removed.");
+				else
+					Logging.Log("Startup task was not removed.", 1);
 			} else {
 				if (File.Exists(Path.Combine(
 					    Environment.GetFolderPath(Environment.SpecialFolder.Startup),
