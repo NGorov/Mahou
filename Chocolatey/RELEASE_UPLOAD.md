@@ -33,3 +33,9 @@ If you rebuild the application and upload a different `Release_x86_x64.zip`:
    cd Chocolatey
    choco pack
    ```
+
+## Packaging note
+
+The `Mahou.nuspec` file lists only `tools\**` in `<files>` so that no archive
+or other stray files beside `tools` are included in the `.nupkg`. The installer
+is always fetched from GitHub at install time.

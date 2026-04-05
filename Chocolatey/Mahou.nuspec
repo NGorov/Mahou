@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>mahou3</id>
-    <version>3.0</version>
+    <version>3.0.1</version>
     <title>Mahou</title>
     <authors>NGorov</authors>
     <owners>NGorov</owners>
@@ -12,11 +12,14 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Layout switcher that can switch wrongly typed text in correct layout. And much more...</description>
     <summary>Magic layout switcher</summary>
-    <releaseNotes>https://github.com/NGorov/Mahou3</releaseNotes>
+    <releaseNotes>https://github.com/NGorov/Mahou3/releases/tag/v3.0</releaseNotes>
     <tags>layout switcher C# snippets layout-indicator</tags>
     <packageSourceUrl>https://github.com/NGorov/Mahou3/tree/main/Chocolatey</packageSourceUrl>
     <projectSourceUrl>https://github.com/NGorov/Mahou3</projectSourceUrl>
     <docsUrl>https://github.com/NGorov/Mahou3/wiki</docsUrl>
     <bugTrackerUrl>https://github.com/NGorov/Mahou3/issues</bugTrackerUrl>
   </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
 </package>

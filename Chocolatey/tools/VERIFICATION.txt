@@ -3,8 +3,9 @@ VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
-The embedded software (Release_x86_x64.zip) has been downloaded from the
-official GitHub release of the Mahou project.
+This package does not embed the application binary. At install time,
+Chocolatey downloads the official release archive from GitHub and verifies
+it using the SHA256 checksum declared in tools/chocolateyInstall.ps1.
 
 1. Download the official release archive from:
    https://github.com/NGorov/Mahou3/releases/download/v3.0/Release_x86_x64.zip
@@ -12,11 +13,8 @@ official GitHub release of the Mahou project.
 2. Calculate the SHA256 checksum of the downloaded file. In PowerShell:
    Get-FileHash Release_x86_x64.zip -Algorithm SHA256
 
-3. Compare the checksum with the value used in this package:
-   4BA9D2579C1A34C67C65862C52419594F4E9412D65996911D7260606CED0DB1C
-
-4. The file included in this package was taken directly from the official
-   GitHub release without any modifications.
+3. Compare the checksum with the value in tools/chocolateyInstall.ps1:
+   C1E108FFC6CD50A9ADDDE14D85FB7F1B5F51C6338C24E2D96F9E601A1F87E118
 
 Project URL : https://github.com/NGorov/Mahou3
 License URL : https://www.gnu.org/licenses/old-licenses/gpl-2.0.html

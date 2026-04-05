@@ -1,12 +1,13 @@
-$instpth = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-Remove-Item $instpth\Mahou.exe
-Remove-Item $instpth\jkl.dll -Force
-Remove-Item $instpth\jklx86.dll -Force
-Remove-Item $instpth\jkl.exe -Force
-Remove-Item $instpth\jklx86.exe -Force
-$confirmation = Read-Host "Delete Mahou settings, history and snippets?[y/n]"
-if ($confirmation -eq 'y' -And $confirmation -eq 'Y') {
-  Remove-Item $instpth\Mahou.ini -Force
-  Remove-Item $instpth\snippets.txt -Force
-  Remove-Item $instpth\history.txt -Force
+$ErrorActionPreference = 'Stop'
+
+$toolsDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$exePath = Join-Path $toolsDir 'net10.0-windows\Mahou.exe'
+
+if (Test-Path $exePath) {
+  Uninstall-BinFile -Name 'mahou3' -Path $exePath
+}
+
+$installDir = Join-Path $toolsDir 'net10.0-windows'
+if (Test-Path $installDir) {
+  Remove-Item $installDir -Recurse -Force
 }
